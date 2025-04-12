@@ -21,13 +21,17 @@ const FoodCard: React.FC<FoodCardProps> = ({ food }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <Card className="kid-card h-full flex flex-col">
+      <Card className="kid-card h-full flex flex-col overflow-hidden border-2 border-gray-200">
         <CardHeader className="p-4">
           <div className="w-full aspect-square overflow-hidden rounded-xl mb-2">
             <img 
               src={food.image} 
               alt={food.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = '/placeholder.svg';
+              }}
             />
           </div>
           <CardTitle className="text-lg font-bold text-center text-kid-blue">{food.name}</CardTitle>
