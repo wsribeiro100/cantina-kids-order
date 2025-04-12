@@ -87,7 +87,7 @@ export const foodItems: FoodItem[] = [
     name: 'Suco de Uva',
     description: 'Suco natural de uva',
     price: 3.00,
-    image: 'https://images.unsplash.com/photo-1623065422902-30a2d299ead2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+    image: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1355&q=80',
     category: 'bebidas'
   },
   {
