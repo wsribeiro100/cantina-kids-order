@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Kid-friendly colors
+				'kid-blue': '#1E88E5',
+				'kid-yellow': '#FFD600',
+				'kid-green': '#43A047',
+				'kid-red': '#E53935',
+				'kid-purple': '#8E24AA',
+				'kid-orange': '#FB8C00'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +92,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				bounce: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'bounce': 'bounce 1s ease-in-out infinite'
 			}
 		}
 	},
