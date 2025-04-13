@@ -27,10 +27,11 @@ export const useUser = (): UserContextType => {
 
 // Mock users for demonstration
 const MOCK_USERS = [
-  { id: '1', name: 'João Silva', role: 'student' as const, class: '5º Ano A' },
+  { id: '1', name: 'Joao', role: 'student' as const, class: '5º Ano A' },
   { id: '2', name: 'Maria Oliveira', role: 'student' as const, class: '4º Ano B' },
   { id: '3', name: 'Roberto Pai', role: 'parent' as const },
-  { id: '4', name: 'Admin Cantina', role: 'staff' as const },
+  { id: '4', name: 'Func', role: 'staff' as const },
+  { id: '5', name: 'Admin Cantina', role: 'admin' as const },
 ];
 
 interface UserProviderProps {
@@ -50,7 +51,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<Object> => {
     // This is a mock login function
     setIsLoading(true);
     
@@ -63,11 +64,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
           (u) => u.name.toLowerCase() === username.toLowerCase()
         );
 
-        if (foundUser && password === '1234') { // Simple password for demo
+        if (foundUser && password === '123') { // Simple password for demo
           setUser(foundUser);
+          foundUser.success = true
           localStorage.setItem('cantinaUser', JSON.stringify(foundUser));
           setIsLoading(false);
-          resolve(true);
+          resolve(foundUser);
         } else {
           setIsLoading(false);
           resolve(false);

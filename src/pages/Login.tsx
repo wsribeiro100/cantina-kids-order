@@ -31,14 +31,25 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const success = await login(username, password);
-      
-      if (success) {
+      const resp = await login(username, password);
+      console.log(resp);
+      if (resp.success) {
         toast({
           title: 'Login realizado com sucesso',
           description: 'Bem-vindo à Cantina Kids!',
         });
-        navigate('/catalog');
+
+        switch (resp.role) {
+          case 'staff':
+            navigate('/catalogo');
+            break;
+          case 'admin':
+            navigate('/admin');
+          case 'parent':
+          case 'student':
+            navigate('/catalog');
+            break;
+        }
       } else {
         toast({
           title: 'Erro de login',
@@ -59,10 +70,11 @@ const Login: React.FC = () => {
   
   // For demo purposes - show available test users
   const testUsers = [
-    { name: 'João Silva', role: 'Estudante' },
+    { name: 'Joao', role: 'Estudante' },
     { name: 'Maria Oliveira', role: 'Estudante' },
     { name: 'Roberto Pai', role: 'Responsável' },
-    { name: 'Admin Cantina', role: 'Funcionário' },
+    { name: 'Func', role: 'Funcionário' },
+    { name: 'Admin Cantina', role: 'Administrador' },
   ];
 
   return (
@@ -127,7 +139,7 @@ const Login: React.FC = () => {
           <div className="space-y-1 text-sm">
             {testUsers.map((user, index) => (
               <p key={index}>
-                <span className="font-semibold">{user.name}</span> ({user.role}) - Senha: 1234
+                <span className="font-semibold">{user.name}</span> ({user.role}) - Senha: 123
               </p>
             ))}
           </div>

@@ -18,9 +18,7 @@ const AdminDashboard: React.FC = () => {
   React.useEffect(() => {
     if (!user) {
       navigate('/login');
-    } else if (user.role !== 'staff') {
-      navigate('/catalog');
-    }
+    } 
   }, [user, navigate]);
   
   if (!user || user.role !== 'staff') {
