@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { SearchableCombobox } from '@/components/ui/SearchableCombobox'
+import { SearchableDropdownList } from '@/components/ui/SearchableDropdownList';
 
 const CatalogoFunc: React.FC = () => {
   const { user } = useUser();
@@ -20,13 +20,13 @@ const CatalogoFunc: React.FC = () => {
 
   
   const [students, setStudents] = useState([
-    { value: 1, label: 'João Silva 1º Ano' },
-    { value: 2, label: 'Maria Santos 2º Ano' },
-    { value: 3, label: 'Pedro Oliveira 3º Ano' },
-    { value: 4, label: 'Ana Costa 5º Ano' },
-    { value: 5, label: 'Lucas Pereira 5º Ano' }
+    { value: "1", label: 'João Silva 1º Ano' },
+    { value: "2", label: 'Maria Santos 2º Ano' },
+    { value: "3", label: 'Pedro Oliveira 3º Ano' },
+    { value: "4", label: 'Ana Costa 5º Ano' },
+    { value: "5", label: 'Lucas Pereira 5º Ano' }
   ]);
-  const [selectedStudent, setSelectedStudent] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
 
   // Redirect if not logged in
   useEffect(() => {
@@ -77,12 +77,14 @@ const CatalogoFunc: React.FC = () => {
           </p>
         </motion.div>        
         <div className="mb-12">
-        <SearchableCombobox
+          <SearchableDropdownList
             items={students}
             value={selectedStudent}
             onChange={setSelectedStudent}
             placeholder="Selecione um aluno"
-        />
+            searchPlaceholder="Buscar aluno..."
+            noResultsText="Nenhum aluno encontrado."
+          />
         </div>
         
         <div className="relative mb-6">
