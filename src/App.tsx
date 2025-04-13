@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -31,6 +32,10 @@ import ProductManagementPage from "./pages/ProductManagement";
 import NotificationsPage from "./pages/Notifications";
 import AuditLogsPage from "./pages/AuditLogs";
 import OrderTrackingPage from "./pages/OrderTracking";
+
+// Novos imports para as novas rotas
+import ReportsPage from "./pages/Reports";
+import UsersManagementPage from "./pages/UsersManagement";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +70,10 @@ const App = () => (
                 <Route path="/admin/notifications" element={<NotificationsPage />} />
                 <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
                 <Route path="/admin/order-tracking" element={<OrderTrackingPage />} />
+
+                {/* Novas rotas */}
+                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/users" element={<UsersManagementPage />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
