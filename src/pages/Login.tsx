@@ -42,13 +42,14 @@ const Login: React.FC = () => {
         switch (resp.role) {
           case 'staff':
             navigate('/catalogo');
-            break;
+          break;
           case 'admin':
             navigate('/admin');
+          break;
           case 'parent':
           case 'student':
             navigate('/catalog');
-            break;
+          break;
         }
       } else {
         toast({
