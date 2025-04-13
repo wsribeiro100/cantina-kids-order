@@ -1,6 +1,6 @@
 
 export enum TipoUsuario {
-    ADMIN = 'ADMIN',
+    ADMIN = 'Administrador',
     PARENT = 'Responsável',
     STAFF = 'Funcionário',
     STUDENT = 'Estudante'

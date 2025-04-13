@@ -40,15 +40,16 @@ const Login: React.FC = () => {
         });
 
         switch (resp.role) {
+          case 'STAFF':
           case 'staff':
             navigate('/catalogo');
           break;
+          case 'ADMIN':
           case 'admin':
             navigate('/admin');
           break;
-          case 'parent':
-          case 'student':
-            navigate('/catalog');
+          default:
+            navigate('/dashboard');
           break;
         }
       } else {

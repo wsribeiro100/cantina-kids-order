@@ -1,271 +1,227 @@
 
 import React, { useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { 
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, 
+  CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 import { orderHistory } from '@/data/orderHistory';
-import { BarChart, LineChart, ResponsiveContainer, Tooltip, Bar, XAxis, YAxis, CartesianGrid, Line } from 'recharts';
-import { format, subDays, parseISO } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowDownIcon, ArrowUpIcon, DollarSign, TrendingUp } from 'lucide-react';
+import { mockTransactions, TransactionType } from '@/model/Transaction/Transaction';
+
+// Ensure toFixed is only called on numbers
+const formatCurrency = (value: any) => {
+  if (typeof value === 'number') {
+    return value.toFixed(2);
+  }
+  return value;
+};
 
 const FinancialReport: React.FC = () => {
-  const today = new Date();
-  
-  // Calculate totals
-  const totalRevenue = useMemo(() => 
-    orderHistory
-      .filter(order => order.status === 'completed')
-      .reduce((sum, order) => sum + order.total, 0),
-    []
-  );
-  
-  const totalOrders = useMemo(() => 
-    orderHistory.filter(order => order.status === 'completed').length,
-    []
-  );
-  
-  const averageOrderValue = useMemo(() => 
-    totalOrders > 0 ? totalRevenue / totalOrders : 0,
-    [totalRevenue, totalOrders]
-  );
+  // Calculate summary data
+  const summaryData = useMemo(() => {
+    const totalSales = orderHistory.reduce((sum, order) => sum + order.total, 0);
+    const totalOrders = orderHistory.length;
+    const completedOrders = orderHistory.filter(order => order.status === 'completed').length;
+    const pendingOrders = orderHistory.filter(order => order.status === 'pending').length;
+    const cancelledOrders = orderHistory.filter(order => order.status === 'cancelled').length;
+    
+    const deposits = mockTransactions
+      .filter(tx => tx.type === TransactionType.DEPOSIT)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+      
+    const purchases = mockTransactions
+      .filter(tx => tx.type === TransactionType.PURCHASE)
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+      
+    const refunds = mockTransactions
+      .filter(tx => tx.type === TransactionType.REFUND)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+      
+    return {
+      totalSales,
+      totalOrders,
+      completedOrders,
+      pendingOrders,
+      cancelledOrders,
+      averageOrderValue: totalOrders ? totalSales / totalOrders : 0,
+      deposits,
+      purchases,
+      refunds
+    };
+  }, []);
   
   // Prepare data for charts
-  const revenueByDay = useMemo(() => {
-    const days = Array.from({ length: 7 }, (_, i) => {
-      const date = subDays(today, 6 - i);
-      const dateString = format(date, 'yyyy-MM-dd');
-      
-      const dayRevenue = orderHistory
-        .filter(order => 
-          order.status === 'completed' && 
-          format(parseISO(order.date), 'yyyy-MM-dd') === dateString
-        )
-        .reduce((sum, order) => sum + order.total, 0);
-        
-      return {
-        date: format(date, 'dd/MM', { locale: ptBR }),
-        revenue: dayRevenue
-      };
-    });
+  const dailySalesData = useMemo(() => {
+    const salesByDate = orderHistory.reduce((acc: any, order) => {
+      const date = new Date(order.date).toLocaleDateString('pt-BR');
+      if (!acc[date]) {
+        acc[date] = {
+          date,
+          sales: 0,
+          orders: 0
+        };
+      }
+      acc[date].sales += order.total;
+      acc[date].orders += 1;
+      return acc;
+    }, {});
     
-    return days;
+    return Object.values(salesByDate);
   }, []);
   
-  const revenueByCategory = useMemo(() => {
-    const categories = new Map();
-    
-    orderHistory
-      .filter(order => order.status === 'completed')
-      .forEach(order => {
-        order.items.forEach(item => {
-          const category = item.item.category;
-          const amount = item.item.price * item.quantity;
-          
-          if (categories.has(category)) {
-            categories.set(category, categories.get(category) + amount);
-          } else {
-            categories.set(category, amount);
-          }
-        });
+  const categoryData = useMemo(() => {
+    const salesByCategory = orderHistory.reduce((acc: any, order) => {
+      order.items.forEach((item) => {
+        const category = item.item.category;
+        if (!acc[category]) {
+          acc[category] = {
+            name: category,
+            value: 0
+          };
+        }
+        acc[category].value += item.item.price * item.quantity;
       });
-      
-    return Array.from(categories.entries()).map(([category, value]) => ({
-      category,
-      revenue: value
-    }));
+      return acc;
+    }, {});
+    
+    return Object.values(salesByCategory);
   }, []);
   
-  const getCategoryName = (categoryId: string) => {
-    const categoryMap: Record<string, string> = {
-      'sanduiches': 'Sanduíches',
-      'bebidas': 'Bebidas',
-      'frutas': 'Frutas',
-      'lanches': 'Lanches',
-      'pratos': 'Pratos Quentes',
-      'sobremesas': 'Sobremesas'
-    };
-    
-    return categoryMap[categoryId] || categoryId;
+  const statusData = useMemo(() => [
+    { name: 'Concluídos', value: summaryData.completedOrders },
+    { name: 'Pendentes', value: summaryData.pendingOrders },
+    { name: 'Cancelados', value: summaryData.cancelledOrders }
+  ], [summaryData]);
+  
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+  
+  const CATEGORY_COLORS = {
+    bebidas: '#0088FE',
+    sanduiches: '#00C49F',
+    pratos: '#FFBB28',
+    frutas: '#FF8042',
+    sobremesas: '#8884D8'
+  };
+  
+  const STATUS_COLORS = {
+    Concluídos: '#00C49F',
+    Pendentes: '#FFBB28',
+    Cancelados: '#FF8042'
   };
   
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ {totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              +2.5% em relação ao período anterior
-            </p>
-          </CardContent>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Vendas Totais</h3>
+          <p className="text-2xl font-bold">R$ {formatCurrency(summaryData.totalSales)}</p>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pedidos Completados</CardTitle>
-            <ArrowUpIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalOrders}</div>
-            <p className="text-xs text-muted-foreground">
-              +5% em relação ao período anterior
-            </p>
-          </CardContent>
+        <Card className="p-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Total de Pedidos</h3>
+          <p className="text-2xl font-bold">{summaryData.totalOrders}</p>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Valor Médio</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">R$ {averageOrderValue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
-              +0.2% em relação ao período anterior
-            </p>
-          </CardContent>
+        <Card className="p-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Ticket Médio</h3>
+          <p className="text-2xl font-bold">R$ {formatCurrency(summaryData.averageOrderValue)}</p>
+        </Card>
+        
+        <Card className="p-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Recargas</h3>
+          <p className="text-2xl font-bold">R$ {formatCurrency(summaryData.deposits)}</p>
         </Card>
       </div>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>Relatório Financeiro</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="revenue">
-            <TabsList className="mb-6">
-              <TabsTrigger value="revenue">Receita por Dia</TabsTrigger>
-              <TabsTrigger value="category">Receita por Categoria</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="revenue" className="h-[300px]">
-              <ChartContainer
-                config={{
-                  revenue: {
-                    label: "Receita",
-                    color: "#8B5CF6",
-                  },
-                }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={revenueByDay}>
-                    <XAxis 
-                      dataKey="date" 
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={10}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => `R$ ${value}`}
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={10}
-                    />
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                    <Tooltip
-                      content={({active, payload}) => {
-                        if (!active || !payload?.length) return null;
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-sm">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  Data
-                                </span>
-                                <span className="font-bold text-muted-foreground">
-                                  {payload[0].payload.date}
-                                </span>
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  Receita
-                                </span>
-                                <span className="font-bold">
-                                  R$ {payload[0].value.toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#8B5CF6"
-                      activeDot={{ r: 8 }}
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </TabsContent>
-            
-            <TabsContent value="category" className="h-[300px]">
-              <ChartContainer
-                config={{
-                  revenue: {
-                    label: "Receita",
-                    color: "#8B5CF6",
-                  },
-                }}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueByCategory}>
-                    <XAxis 
-                      dataKey="category"
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={getCategoryName}
-                      tickMargin={10}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => `R$ ${value}`}
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={10}
-                    />
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                    <Tooltip
-                      content={({active, payload}) => {
-                        if (!active || !payload?.length) return null;
-                        return (
-                          <div className="rounded-lg border bg-background p-2 shadow-sm">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  Categoria
-                                </span>
-                                <span className="font-bold text-muted-foreground">
-                                  {getCategoryName(payload[0].payload.category)}
-                                </span>
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-[0.70rem] uppercase text-muted-foreground">
-                                  Receita
-                                </span>
-                                <span className="font-bold">
-                                  R$ {payload[0].value.toFixed(2)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }}
-                    />
-                    <Bar dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+      {/* Sales Trend Chart */}
+      <Card className="p-6">
+        <h2 className="text-lg font-medium mb-6">Tendência de Vendas Diárias</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={dailySalesData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <Tooltip formatter={(value) => `R$ ${formatCurrency(value)}`} />
+            <Legend />
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              dataKey="sales" 
+              name="Vendas (R$)" 
+              stroke="#8884d8" 
+              activeDot={{ r: 8 }} 
+            />
+            <Line 
+              yAxisId="right"
+              type="monotone" 
+              dataKey="orders" 
+              name="Número de Pedidos" 
+              stroke="#82ca9d" 
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </Card>
+      
+      {/* Sales by Category Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h2 className="text-lg font-medium mb-6">Vendas por Categoria</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {categoryData.map((entry: any, index: number) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={CATEGORY_COLORS[entry.name as keyof typeof CATEGORY_COLORS] || COLORS[index % COLORS.length]} 
+                  />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `R$ ${formatCurrency(value)}`} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+        
+        {/* Orders by Status Chart */}
+        <Card className="p-6">
+          <h2 className="text-lg font-medium mb-6">Pedidos por Status</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={statusData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {statusData.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={STATUS_COLORS[entry.name as keyof typeof STATUS_COLORS]} 
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
     </div>
   );
 };

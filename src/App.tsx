@@ -18,6 +18,14 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CatalogoFunc from "./pages/CatalogoFunc";
 import NotFound from "./pages/NotFound";
 
+// New Pages
+import UserDashboard from "./pages/UserDashboard";
+import UserProfilePage from "./pages/UserProfile";
+import UserRegistrationPage from "./pages/UserRegistration";
+import WalletPage from "./pages/Wallet";
+import OrderHistoryPage from "./pages/OrderHistory";
+import Checkout from "./pages/Checkout";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +45,15 @@ const App = () => (
                 <Route path="/confirmation" element={<OrderConfirmation />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/catalogo" element={<CatalogoFunc />} />
+                
+                {/* New Routes */}
+                <Route path="/dashboard" element={<UserDashboard />} />
+                <Route path="/profile" element={<UserProfilePage />} />
+                <Route path="/registration" element={<UserRegistrationPage />} />
+                <Route path="/wallet" element={<WalletPage />} />
+                <Route path="/order-history" element={<OrderHistoryPage />} />
+                <Route path="/checkout" element={<Checkout />} />
+                
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

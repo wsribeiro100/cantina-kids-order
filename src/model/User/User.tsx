@@ -1,4 +1,5 @@
-import { TipoUsuario } from '../model/User/Enuns/TipoUsuario';
+
+import { TipoUsuario } from './Enuns/TipoUsuario';
 
 interface IUser {
     id: string;
@@ -8,6 +9,10 @@ interface IUser {
     active: boolean;
     createdAt: Date;
     updatedAt: Date;
+    balance?: number;
+    profileImage?: string;
+    dietaryPreferences?: string[];
+    class?: string;
 }
 
 export class User implements IUser {
@@ -18,6 +23,10 @@ export class User implements IUser {
     active: boolean;
     createdAt: Date;
     updatedAt: Date;
+    balance?: number;
+    profileImage?: string;
+    dietaryPreferences?: string[];
+    class?: string;
     
     // Getters
     getId(): string {
@@ -48,6 +57,22 @@ export class User implements IUser {
         return this.updatedAt;
     }
 
+    getBalance(): number {
+        return this.balance || 0;
+    }
+
+    getProfileImage(): string {
+        return this.profileImage || '';
+    }
+
+    getDietaryPreferences(): string[] {
+        return this.dietaryPreferences || [];
+    }
+
+    getClass(): string {
+        return this.class || '';
+    }
+
     // Setters
     setId(id: string): void {
         this.id = id;
@@ -75,5 +100,21 @@ export class User implements IUser {
 
     setUpdatedAt(updatedAt: Date): void {
         this.updatedAt = updatedAt;
+    }
+
+    setBalance(balance: number): void {
+        this.balance = balance;
+    }
+
+    setProfileImage(profileImage: string): void {
+        this.profileImage = profileImage;
+    }
+
+    setDietaryPreferences(dietaryPreferences: string[]): void {
+        this.dietaryPreferences = dietaryPreferences;
+    }
+
+    setClass(classValue: string): void {
+        this.class = classValue;
     }
 }
