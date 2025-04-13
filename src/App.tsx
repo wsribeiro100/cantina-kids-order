@@ -26,6 +26,12 @@ import WalletPage from "./pages/Wallet";
 import OrderHistoryPage from "./pages/OrderHistory";
 import Checkout from "./pages/Checkout";
 
+// Admin pages
+import ProductManagementPage from "./pages/ProductManagement";
+import NotificationsPage from "./pages/Notifications";
+import AuditLogsPage from "./pages/AuditLogs";
+import OrderTrackingPage from "./pages/OrderTracking";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -46,13 +52,19 @@ const App = () => (
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/catalogo" element={<CatalogoFunc />} />
                 
-                {/* New Routes */}
+                {/* User Routes */}
                 <Route path="/dashboard" element={<UserDashboard />} />
                 <Route path="/profile" element={<UserProfilePage />} />
                 <Route path="/registration" element={<UserRegistrationPage />} />
                 <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/order-history" element={<OrderHistoryPage />} />
                 <Route path="/checkout" element={<Checkout />} />
+                
+                {/* Admin Routes */}
+                <Route path="/admin/products" element={<ProductManagementPage />} />
+                <Route path="/admin/notifications" element={<NotificationsPage />} />
+                <Route path="/admin/audit-logs" element={<AuditLogsPage />} />
+                <Route path="/admin/order-tracking" element={<OrderTrackingPage />} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
