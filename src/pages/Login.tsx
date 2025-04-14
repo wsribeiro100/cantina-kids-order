@@ -38,10 +38,11 @@ const Login: React.FC = () => {
           title: 'Login realizado com sucesso',
           description: 'Bem-vindo à Cantina Kids!',
         });
-
+        console.log(resp.role);
         switch (resp.role) {
           case 'STAFF':
           case 'staff':
+          case 'Funcionário':
             navigate('/catalogo');
           break;
           case 'ADMIN':

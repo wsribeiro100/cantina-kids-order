@@ -64,7 +64,7 @@ const App = () => (
                 <Route path="/wallet" element={<WalletPage />} />
                 <Route path="/order-history" element={<OrderHistoryPage />} />
                 <Route path="/checkout" element={<Checkout />} />
-                
+                f
                 {/* Admin Routes */}
                 <Route path="/admin/products" element={<ProductManagementPage />} />
                 <Route path="/admin/notifications" element={<NotificationsPage />} />

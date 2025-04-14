@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SearchableDropdownList } from '@/components/ui/SearchableDropdownList';
+import { TipoUsuario } from '@/model/User/Enuns/TipoUsuario';
 
 const CatalogoFunc: React.FC = () => {
   const { user } = useUser();
@@ -20,11 +21,11 @@ const CatalogoFunc: React.FC = () => {
 
   
   const [students, setStudents] = useState([
-    { value: "1", label: 'João Silva 1º Ano' },
-    { value: "2", label: 'Maria Santos 2º Ano' },
-    { value: "3", label: 'Pedro Oliveira 3º Ano' },
-    { value: "4", label: 'Ana Costa 5º Ano' },
-    { value: "5", label: 'Lucas Pereira 5º Ano' }
+    { value: "1", label: '1000 - João Silva 1º Ano' },
+    { value: "2", label: '999 - Maria Santos 2º Ano' },
+    { value: "3", label: '500 - Pedro Oliveira 3º Ano' },
+    { value: "4", label: '100 - Ana Costa 5º Ano' },
+    { value: "5", label: '200 - Lucas Pereira 5º Ano' }
   ]);
   const [selectedStudent, setSelectedStudent] = useState<string>('');
 
@@ -33,6 +34,11 @@ const CatalogoFunc: React.FC = () => {
     if (!user) {
       navigate('/login');
     }
+
+    if (!user || user.role == TipoUsuario.STUDENT) {
+      navigate('/login');
+    }
+
   }, [user, navigate]);
 
   // Filter items based on category and search query

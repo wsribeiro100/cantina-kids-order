@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { useUser } from '@/contexts/UserContext';
-import { ShoppingCart, LogOut, User } from 'lucide-react';
+import { ShoppingCart, LogOut, User, Wallet, ClipboardList, BarChart2, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -30,8 +30,8 @@ const Header: React.FC = () => {
         <div className="flex items-center space-x-2">
           {user && (
             <>
-              <div className="flex items-center mr-4">
-                <User className="h-5 w-5 text-kid-purple mr-1" />
+              <div className="flex items-center mr-4" >
+                <Link to="/profile"><User className="h-5 w-5 text-kid-purple mr-1" /></Link>
                 <span className="text-sm font-medium hidden md:inline">{user.name}</span>
               </div>
               
@@ -45,7 +45,39 @@ const Header: React.FC = () => {
                   )}
                 </Button>
               </Link>
+
+             
               
+              <Link to="/wallet">
+                <Button variant="ghost" className="p-2 text-kid-blue">
+                  <Wallet className="h-6 w-6" />
+                </Button>
+              </Link>
+
+              <Link to="/order-history">
+                <Button variant="ghost" className="p-2 text-kid-blue">
+                  <ClipboardList className="h-6 w-6" />
+                </Button>
+              </Link>
+
+              <Link to="/reports">
+                <Button variant="ghost" className="p-2 text-kid-blue">
+                  <BarChart2 className="h-6 w-6" />
+                </Button>
+              </Link>
+
+              <Link to="/admin/products">
+                <Button variant="ghost" className="p-2 text-kid-blue">
+                  <Package className="h-6 w-6" />
+                </Button>
+              </Link>
+
+              <Link to="/catalogo">
+                <Button variant="ghost" className="p-2 text-kid-blue">
+                  <Wallet className="h-6 w-6" />
+                </Button>
+              </Link>
+
               <Button variant="ghost" onClick={handleLogout} className="p-2 text-kid-red">
                 <LogOut className="h-6 w-6" />
               </Button>
